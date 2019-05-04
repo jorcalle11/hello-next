@@ -1,12 +1,12 @@
 import Layout from '../components/Layout';
 import Link from 'next/link';
-import fetch from 'isomorphic-unfetch';
+import loadDB from '../lib/load-db';
 
-function PostLink({ id, name }) {
+function PostLink({ id, title }) {
   return (
     <li>
       <Link as={`/p/${id}`} href={`/post?id=${id}`}>
-        <a>{name}</a>
+        <a>{title}</a>
       </Link>
       <style jsx>
         {`
@@ -29,13 +29,13 @@ function PostLink({ id, name }) {
   );
 }
 
-function Blog({ shows }) {
+function Blog({ stories }) {
   return (
     <Layout>
-      <h1>Batman TV Shows</h1>
+      <h1>Hacker News - Latest</h1>
       <ul>
-        {shows.map(show => (
-          <PostLink key={show.id} id={show.id} name={show.name} />
+        {stories.map(story => (
+          <PostLink key={story.id} id={story.id} title={story.title} />
         ))}
       </ul>
       <style jsx>{`
@@ -53,11 +53,22 @@ function Blog({ shows }) {
 }
 
 Blog.getInitialProps = async function() {
-  const res = await fetch('https://api.tvmaze.com/search/shows?q=batman');
-  const data = await res.json();
-  const shows = data.map(i => i.show);
-  console.log(`Show data fetched. Count: ${data.length}`);
-  return { shows };
+  const db = await loadDB();
+  const ids = await db.child('topstories').once('value');
+  const promises = ids
+    .val()
+    .slice(0, 10)
+    .map(id => {
+      return db
+        .child('item')
+        .child(id)
+        .once('value');
+    });
+  const result = await Promise.all(promises);
+  const stories = result.map(s => s.val());
+
+  console.log(`Show data fetched. Count: ${stories.length}`);
+  return { stories };
 };
 
 export default Blog;

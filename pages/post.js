@@ -1,22 +1,30 @@
 import Layout from '../components/Layout';
-import fecth from 'isomorphic-unfetch';
+import loadDB from '../lib/load-db';
 
-function Post({ show }) {
+function Post({ item }) {
   return (
     <Layout>
-      <h1>{show.name}</h1>
-      <p>{show.summary.replace(/<[/]?p>/g, '')}</p>
-      <img src={show.image.medium} />
+      <h1>{item.title}</h1>
+      <p>
+        URL:{' '}
+        <a target="_blank" href={item.url}>
+          {item.url}
+        </a>
+      </p>
     </Layout>
   );
 }
 
 Post.getInitialProps = async function(context) {
   const id = context.query.id;
-  const res = await fetch(`https://api.tvmaze.com/shows/${id}`);
-  const show = await res.json();
-  console.log(`Fetched show ${show.name}`);
-  return { show };
+  const db = await loadDB();
+  let item = await db
+    .child('item')
+    .child(id)
+    .once('value');
+
+  item = item.val();
+  return { item };
 };
 
 export default Post;
