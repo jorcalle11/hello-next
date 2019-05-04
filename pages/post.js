@@ -12,7 +12,6 @@ function Post({ show }) {
 }
 
 Post.getInitialProps = async function(context) {
-  console.log(context);
   const id = context.query.id;
   const res = await fetch(`https://api.tvmaze.com/shows/${id}`);
   const show = await res.json();
