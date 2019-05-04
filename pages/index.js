@@ -2,11 +2,11 @@ import Layout from '../components/Layout';
 import Link from 'next/link';
 import fetch from 'isomorphic-unfetch';
 
-function PostLink({ id, name }) {
+function PostLink({ id, title }) {
   return (
     <li>
-      <Link as={`/p/${id}`} href={`/post?id=${id}`}>
-        <a>{name}</a>
+      <Link as={`/p/${id}`} href={`/post?id=${title}`}>
+        <a>{title}</a>
       </Link>
       <style jsx>
         {`
@@ -29,13 +29,13 @@ function PostLink({ id, name }) {
   );
 }
 
-function Blog({ shows }) {
+function Blog() {
   return (
     <Layout>
-      <h1>Batman TV Shows</h1>
+      <h1>My Blog</h1>
       <ul>
-        {shows.map(show => (
-          <PostLink key={show.id} id={show.id} name={show.name} />
+        {getPosts().map(post => (
+          <PostLink key={post.id} id={post.id} title={post.title} />
         ))}
       </ul>
       <style jsx>{`
@@ -52,12 +52,12 @@ function Blog({ shows }) {
   );
 }
 
-Blog.getInitialProps = async function() {
-  const res = await fetch('https://api.tvmaze.com/search/shows?q=batman');
-  const data = await res.json();
-  const shows = data.map(i => i.show);
-  console.log(`Show data fetched. Count: ${data.length}`);
-  return { shows };
-};
+function getPosts() {
+  return [
+    { id: 'hello-nextjs', title: 'Hello Next.js' },
+    { id: 'learn-nextjs', title: 'Learn Next.js is awesome' },
+    { id: 'deploy-apps-with-zeit', title: 'Deploy apps with Zeit' }
+  ];
+}
 
 export default Blog;
