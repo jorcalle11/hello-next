@@ -1,5 +1,6 @@
 # next files
 .next
+out
 
 # dependencies
 node_modules
