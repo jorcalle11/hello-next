@@ -1,25 +1,36 @@
 import Layout from '../components/Layout';
 import Link from 'next/link';
+import fetch from 'isomorphic-unfetch';
 
-function PostLink(props) {
+function PostLink({ id, name }) {
   return (
     <li>
-      <Link as={`/p/${props.id}`} href={`/post?title=${props.title}`}>
-        <a>{props.title}</a>
+      <Link as={`/p/${id}`} href={`/post?id=${id}`}>
+        <a>{name}</a>
       </Link>
     </li>
   );
 }
 
-export default function Blog() {
+function Blog({ shows }) {
   return (
     <Layout>
-      <h1>My Blog</h1>
+      <h1>Batman TV Shows</h1>
       <ul>
-        <PostLink id="hello-nextjs" title="Hello Next.js" />
-        <PostLink id="learn-nextjs" title="Learn Next.js is awesome" />
-        <PostLink id="deploy-nextjs" title="Deploy apps with Zeit" />
+        {shows.map(show => (
+          <PostLink key={show.id} id={show.id} name={show.name} />
+        ))}
       </ul>
     </Layout>
   );
 }
+
+Blog.getInitialProps = async function() {
+  const res = await fetch('https://api.tvmaze.com/search/shows?q=batman');
+  const data = await res.json();
+  const shows = data.map(i => i.show);
+  console.log(`Show data fetched. Count: ${data.length}`);
+  return { shows };
+};
+
+export default Blog;
