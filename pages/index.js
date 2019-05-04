@@ -8,6 +8,23 @@ function PostLink({ id, name }) {
       <Link as={`/p/${id}`} href={`/post?id=${id}`}>
         <a>{name}</a>
       </Link>
+      <style jsx>
+        {`
+          li {
+            list-style-type: none !important;
+            margin: 5px 0;
+          }
+
+          a {
+            text-decoration: none;
+            color: blue;
+          }
+
+          a:hover {
+            opacity: 0.6;
+          }
+        `}
+      </style>
     </li>
   );
 }
@@ -21,6 +38,16 @@ function Blog({ shows }) {
           <PostLink key={show.id} id={show.id} name={show.name} />
         ))}
       </ul>
+      <style jsx>{`
+        h1,
+        a {
+          font-family: 'Arial';
+        }
+
+        ul {
+          padding: 0;
+        }
+      `}</style>
     </Layout>
   );
 }
